@@ -1,15 +1,21 @@
 import streamlit as st
-import pyhwp
+import subprocess
 import os
 
-def read_hwp_text(hwp_path):
-    """HWP 파일에서 텍스트 추출"""
+def convert_hwp_to_txt(hwp_path):
+    """unoconv를 사용하여 HWP 파일을 TXT로 변환"""
+    output_path = hwp_path.replace(".hwp", ".txt")
+    
+    # LibreOffice를 사용하여 변환 실행
+    command = f"unoconv -f txt {hwp_path}"
+    
     try:
-        with pyhwp.HWPReader.from_path(hwp_path) as doc:
-            text = doc.to_text()
+        subprocess.run(command, shell=True, check=True)
+        with open(output_path, "r", encoding="utf-8") as f:
+            text = f.read()
         return text
     except Exception as e:
-        return f"HWP 파일을 읽는 중 오류 발생: {e}"
+        return f"오류 발생: {e}"
 
 # Streamlit UI 설정
 st.title("📄 HWP 맞춤법 검사기")
@@ -23,10 +29,11 @@ if uploaded_file is not None:
     with open(temp_file_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
     
-    # HWP 파일 읽기
-    original_text = read_hwp_text(temp_file_path)
+    # HWP 파일을 TXT로 변환
+    original_text = convert_hwp_to_txt(temp_file_path)
     st.text_area("📄 원본 텍스트", original_text, height=200)
     
     # 파일 삭제 (선택사항)
     os.remove(temp_file_path)
+
 
