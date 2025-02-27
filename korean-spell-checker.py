@@ -8,21 +8,26 @@ from hanspell import spell_checker  # 한글 맞춤법 검사기
 
 def read_hwp_text(hwp_file):
     """
-    한글 파일을 텍스트로 변환 (외부 도구 필요)
-    실제 구현에서는 hwp5txt 또는 한글과컴퓨터에서 제공하는 SDK 사용 필요
+    한글 파일을 텍스트로 변환 (hwp5txt 사용)
     """
-    # 주의: 이 부분은 실제 구현 시 한글과컴퓨터의 SDK나 hwp5txt 등의 도구를 사용해야 합니다
-    # 이 예제에서는 개념적으로만 구현합니다
     print(f"{hwp_file} 파일을 텍스트로 변환 중...")
     
-    # 실제 구현 시 아래 코드 대신 외부 도구 사용 필요
-    # 예: os.system(f"hwp5txt {hwp_file} > {hwp_file}.txt")
-    
-    # 임시 파일 생성 가정
-    temp_txt_file = f"{hwp_file}.txt"
-    
-    # 실제로는 아래 부분 대신 변환된 파일을 읽어야 함
-    return "이것은 한글파일에서 추출한 텍스트 입니다. 맞춤법 검사를 실행 합니다."
+    # hwp5txt를 사용하여 텍스트 파일로 변환
+    try:
+        # hwp5txt는 출력을 stdout으로 하기 때문에 > 를 사용해야 합니다.
+        os.system(f"hwp5txt \"{hwp_file}\" > \"{hwp_file}.txt\"")
+        
+        # 변환된 텍스트 파일 읽기
+        with open(f"{hwp_file}.txt", "r", encoding="utf-8") as f:
+            text = f.read()
+        
+        # 임시 파일 삭제
+        os.remove(f"{hwp_file}.txt")
+        
+        return text
+    except Exception as e:
+        print(f"hwp 파일 변환 중 오류 발생: {e}")
+        return ""
 
 def read_docx_text(docx_file):
     """
